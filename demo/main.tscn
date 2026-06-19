@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://b65ihhw4mf1xg" path="res://cube.gd" id="1_ig7tw"]
 [ext_resource type="Script" uid="uid://cwemmgu7351t2" path="res://ai_controller_3d.gd" id="2_0xm2m"]
+[ext_resource type="Script" uid="uid://duuo1hw5urln4" path="res://target.gd" id="3_1bvp3"]
 [ext_resource type="Script" uid="uid://bi6dxmjbmqrhj" path="res://addons/godot_rl_agents/sync.gd" id="3_h2yge"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_57qmd"]
@@ -28,6 +29,45 @@ emission = Color(0, 0.9411765, 0.4509804, 1)
 [sub_resource type="BoxMesh" id="BoxMesh_57qmd"]
 material = SubResource("StandardMaterial3D_d0u6y")
 
+[sub_resource type="Gradient" id="Gradient_1bvp3"]
+offsets = PackedFloat32Array(0, 0.5163934, 0.9918033)
+colors = PackedColorArray(0, 0.20000005, 1, 1, 0, 0.95, 0.90250003, 1, 1, 0.39, 0.39, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_lquwl"]
+gradient = SubResource("Gradient_1bvp3")
+
+[sub_resource type="Curve" id="Curve_1bvp3"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_kek77"]
+curve = SubResource("Curve_1bvp3")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_5vw27"]
+particle_flag_align_y = true
+emission_shape_offset = Vector3(0, 0.04, 0)
+direction = Vector3(0, 1, 0)
+spread = 90.0
+initial_velocity_min = 15.0
+initial_velocity_max = 25.0
+gravity = Vector3(0, -50, 0)
+scale_min = 0.5
+scale_curve = SubResource("CurveTexture_kek77")
+color_initial_ramp = SubResource("GradientTexture1D_lquwl")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ycdy4"]
+cull_mode = 2
+shading_mode = 0
+vertex_color_use_as_albedo = true
+use_particle_trails = true
+
+[sub_resource type="RibbonTrailMesh" id="RibbonTrailMesh_dg77c"]
+material = SubResource("StandardMaterial3D_ycdy4")
+shape = 0
+size = 0.15
+sections = 3
+section_length = 0.01
+
 [sub_resource type="BoxShape3D" id="BoxShape3D_d0u6y"]
 size = Vector3(10, 1, 1)
 
@@ -38,6 +78,7 @@ size = Vector3(1, 1, 10)
 
 [node name="Cube" type="CharacterBody3D" parent="." unique_id=300643979]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.57361555, 3.0943441)
+collision_layer = 2
 script = ExtResource("1_ig7tw")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Cube" unique_id=109703411]
@@ -60,6 +101,8 @@ shape = SubResource("ConcavePolygonShape3D_0xm2m")
 
 [node name="Target" type="Area3D" parent="." unique_id=1297331391]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.29913282, -3.4700618)
+collision_mask = 2
+script = ExtResource("3_1bvp3")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Target" unique_id=599031849]
 shape = SubResource("BoxShape3D_yf5fn")
@@ -67,7 +110,17 @@ shape = SubResource("BoxShape3D_yf5fn")
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Target" unique_id=198388070]
 mesh = SubResource("BoxMesh_57qmd")
 
+[node name="GPUParticles3D" type="GPUParticles3D" parent="Target" unique_id=2132501729]
+emitting = false
+amount = 48
+one_shot = true
+explosiveness = 0.5
+trail_enabled = true
+process_material = SubResource("ParticleProcessMaterial_5vw27")
+draw_pass_1 = SubResource("RibbonTrailMesh_dg77c")
+
 [node name="Wall" type="Area3D" parent="." unique_id=440425632]
+collision_mask = 2
 
 [node name="CollisionShape3D4" type="CollisionShape3D" parent="Wall" unique_id=1681138455]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5.345487)

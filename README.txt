@@ -3,7 +3,21 @@ GUIA COMPLETO: CONFIGURANDO AMBIENTE VIRTUAL RL PARA GODOT RL AGENTS
 ================================================================================
 
 Este guia explica como configurar um ambiente virtual Python para treinar
-agentes de Reinforcement Learning com Godot RL Agents.
+agentes de Reinforcement Learning com Godot RL Agents, onde o ambiente demonstra
+um agente de Reinforcement Learning aprendendo a navegar até um alvo em um 
+espaço 3D simples usando o Godot RL Agents. A cena é composta por um Cube 
+(o agente, controlado pelo nó AIController3D do plugin), um Floor (a plataforma
+onde o agente se movimenta) e um Target (o objetivo a ser alcançado). A cada 
+episódio de treinamento, o agente parte de uma posição inicial e recebe como 
+observação sua posição e a distância relativa até o alvo. Com base nessa
+observação, o modelo treinado com PPO (via Stable Baselines3) decide uma ação 
+contínua de movimento, aplicada ao cubo a cada passo de física. O agente recebe 
+recompensas negativas a cada passo, incentivando eficiência, e uma recompensa 
+positiva ao tocar o alvo, encerrando o episódio com sucesso. Repetindo esse 
+processo por milhares de episódios, a rede neural ajusta seus pesos para 
+maximizar a recompensa acumulada, fazendo o cubo aprender sozinho, por tentativa
+e erro, a se deslocar até o Target de forma consistente, sem que o comportamento
+de navegação tenha sido programado manualmente.
 
 ================================================================================
 PRÉ-REQUISITOS
@@ -11,7 +25,11 @@ PRÉ-REQUISITOS
 
 - Python 3.8 ou superior instalado
 - Godot 4.x instalado
-- Plugin Godot RL Agents instalado no projeto
+- Plugin Godot RL Agents instalado no projetoNo começo, as ações são praticamente aleatórias (o cubo anda sem rumo). Mas como o PPO ajusta os pesos da rede neural pra maximizar a recompensa acumulada, ao longo de muitos episódios o cubo começa a associar "andar na direção do alvo" com recompensa maior, até convergir num comportamento consistente de navegação — sem que ninguém tenha programado explicitamente "vá até lá", como aconteceria com uma FSM tradicional.
+
+Isso bate exatamente com o que vimos no artigo original: é praticamente o mesmo conceito do ambiente de referência Ball Chase (agente 2D navegando até um alvo), só que aqui adaptado pra 3D com um cubo simples.
+
+Se quiser, posso te ajudar a olhar o conteúdo do cube.gd, ai_controller_3d.gd e target.gd pra confirmar exatamente como get_obs, get_reward e set_action foram implementados — aí a explicação fica 100% fiel ao seu código em vez de inferida pela estrutura da cena.
 
 ================================================================================
 PASSO 1: CRIAR O AMBIENTE VIRTUAL
